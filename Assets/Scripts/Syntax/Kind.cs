@@ -1,0 +1,5 @@
+namespace Syntax;
+
+class Kind {
+    
+}
