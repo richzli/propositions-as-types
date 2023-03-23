@@ -1,10 +1,10 @@
 namespace Syntax;
 
-class TypeApp : Type {
-    private Type t1 { get; set; }
-    private Term t2 { get; set; }
+class TypeApp : TType {
+    public TType t1 { get; set; }
+    public Term t2 { get; set; }
 
-    public TypeApp(Type t1, Term t2) {
+    public TypeApp(TType t1, Term t2) {
         this.t1 = t1;
         this.t2 = t2;
     }

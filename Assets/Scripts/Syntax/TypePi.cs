@@ -1,11 +1,11 @@
 namespace Syntax;
 
-class TypePi : Type {
-    private Var x { get; set; }
-    private Type t { get; set; }
-    private Type body { get; set; }
+class TypePi : TType {
+    public Var x { get; set; }
+    public TType t { get; set; }
+    public TType body { get; set; }
 
-    public TypePi(Var x, Type t, Type body) {
+    public TypePi(Var x, TType t, TType body) {
         this.x = x;
         this.t = t;
         this.body = body;

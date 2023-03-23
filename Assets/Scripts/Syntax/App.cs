@@ -1,8 +1,8 @@
 namespace Syntax;
 
 class App : Term {
-    private Term t1 { get; set; }
-    private Term t2 { get; set; }
+    public Term t1 { get; set; }
+    public Term t2 { get; set; }
 
     public App(Term t1, Term t2) {
         this.t1 = t1;
