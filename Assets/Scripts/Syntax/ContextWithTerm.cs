@@ -15,4 +15,16 @@ class ContextWithTerm : Context {
     {
         return String.Format("{0}, {1}:{2}", prev, x, t);
     }
+
+    public TType? Check(Var x) {
+        if (this.x.Equals(x)) {
+            return t;
+        } else {
+            return prev.Check(x);
+        }
+    }
+
+    public Kind? Check(TypeVar t) {
+        return prev.Check(t);
+    }
 }
