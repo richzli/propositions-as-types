@@ -8,7 +8,7 @@ class Program {
         // modus ponens
         // A -> (A -> B) -> B
         Inference goal = new Inference(new JudgementTyping(
-            // no dependent types yet, so manually say A and B are well-kinded
+            // manually say A and B are well-kinded--need to add support for type polymorphism...
             new ContextWithType(
                 new ContextWithType(
                     ContextEmpty.EMPTY,
