@@ -6,11 +6,11 @@ class ContextEmpty : Context {
         return "∅";
     }
 
-    public TType? Check(Var x) {
+    public override TType? Check(Var x) {
         return null;
     }
 
-    public Kind? Check(TypeVar t) {
+    public override Kind? Check(TypeVar t) {
         return null;
     }
 }

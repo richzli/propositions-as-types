@@ -16,11 +16,11 @@ class ContextWithType : Context {
         return String.Format("{0}, {1}:{2}", prev, x, k);
     }
 
-    public TType? Check(Var x) {
+    public override TType? Check(Var x) {
         return prev.Check(x);
     }
 
-    public Kind? Check(TypeVar t) {
+    public override Kind? Check(TypeVar t) {
         if (this.x.Equals(t)) {
             return k;
         } else {

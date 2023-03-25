@@ -16,7 +16,7 @@ class ContextWithTerm : Context {
         return String.Format("{0}, {1}:{2}", prev, x, t);
     }
 
-    public TType? Check(Var x) {
+    public override TType? Check(Var x) {
         if (this.x.Equals(x)) {
             return t;
         } else {
@@ -24,7 +24,7 @@ class ContextWithTerm : Context {
         }
     }
 
-    public Kind? Check(TypeVar t) {
+    public override Kind? Check(TypeVar t) {
         return prev.Check(t);
     }
 }

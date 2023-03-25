@@ -1,5 +1,5 @@
 namespace Syntax;
 
-class Term {
+abstract class Term {
     
 }

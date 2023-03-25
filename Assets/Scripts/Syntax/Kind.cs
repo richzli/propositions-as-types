@@ -1,5 +1,5 @@
 namespace Syntax;
 
-class Kind {
+abstract class Kind {
     
 }

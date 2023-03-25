@@ -1,5 +1,5 @@
 namespace Syntax;
 
-class TType {
+abstract class TType {
     
 }

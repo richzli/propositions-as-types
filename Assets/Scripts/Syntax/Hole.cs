@@ -5,6 +5,7 @@ class Hole : Term {
     public static List<Hole> holes = new List<Hole>();
 
     public int label { get; set; }
+    // if x is null, then the hole is unfilled
     public Term? x { get; set; }
 
     public Hole() {
