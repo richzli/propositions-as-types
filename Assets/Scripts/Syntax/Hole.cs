@@ -55,6 +55,10 @@ public class Hole : Term {
 
     public override string ToString()
     {
-        return String.Format("[{0}]", label);
+        if (!Filled()) {
+            return String.Format("[{0}]", label);
+        } else {
+            return String.Format("{0}", x);
+        }
     }
 }
