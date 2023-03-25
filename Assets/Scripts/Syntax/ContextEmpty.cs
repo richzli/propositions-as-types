@@ -1,6 +1,19 @@
 namespace Syntax;
 
-class ContextEmpty : Context {
+public class ContextEmpty : Context {
+    private ContextEmpty() {}
+
+    private static ContextEmpty? instance = null;
+
+    public static ContextEmpty EMPTY {
+        get {
+            if (instance == null) {
+                instance = new ContextEmpty();
+            }
+            return instance;
+        }
+    }
+
     public override string ToString()
     {
         return "∅";

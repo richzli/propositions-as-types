@@ -1,6 +1,6 @@
 namespace Syntax;
 
-class TypeVar : TType {
+public class TypeVar : TType {
     public static int counter = 1;
     public static HashSet<string> names = new HashSet<String>();
 
@@ -13,6 +13,14 @@ class TypeVar : TType {
     public TypeVar(string name) {
         this.name = name.ToUpper();
         TypeVar.names.Add(name.ToUpper());
+    }
+
+    public override bool Is(Object tv) {
+        if (!(tv is TypeVar)) {
+            return false;
+        }
+
+        return this.name.Equals(((TypeVar) tv).name);
     }
 
     public override string ToString() {

@@ -2,7 +2,7 @@ using Syntax;
 
 namespace Semantics;
 
-class JudgementTermEquiv : Judgement {
+public class JudgementTermEquiv : Judgement {
     public Term x1 { get; set; }
     public Term x2 { get; set; }
     public TType t { get; set; }
@@ -11,5 +11,10 @@ class JudgementTermEquiv : Judgement {
         this.x1 = x1;
         this.x2 = x2;
         this.t = t;
+    }
+
+    public override string ToString()
+    {
+        return String.Format("{0} ⊢ {1} ≡ {2} : {3}", L, x1, x2, t);
     }
 }

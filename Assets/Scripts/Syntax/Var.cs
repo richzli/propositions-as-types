@@ -1,6 +1,6 @@
 namespace Syntax;
 
-class Var : Term {
+public class Var : Term {
     public static int counter = 1;
     public static HashSet<string> names = new HashSet<String>();
 
@@ -10,13 +10,33 @@ class Var : Term {
         this.name = GetNewName();
     }
 
+    public Var(Var prev) {
+        this.name = prev.name;
+    }
+
     public Var(string name) {
         this.name = name.ToLower();
         Var.names.Add(name.ToLower());
     }
 
+    public override bool Is(Object t) {
+        if (t is Hole && ((Hole) t).Filled()) {
+            return this.Is(((Hole) t).x!);
+        }
+
+        if (!(t is Var)) {
+            return false;
+        }
+
+        return this.name.Equals(((Var) t).name);
+    }
+
     public override string ToString() {
         return name;
+    }
+
+    public override bool Filled() {
+        return true;
     }
 
     private static string GetNewName() {

@@ -1,6 +1,6 @@
 namespace Syntax;
 
-class ContextWithTerm : Context {
+public class ContextWithTerm : Context {
     public Context prev { get; set; }
     public Var x { get; set; }
     public TType t { get; set; }
@@ -13,11 +13,11 @@ class ContextWithTerm : Context {
 
     public override string ToString()
     {
-        return String.Format("{0}, {1}:{2}", prev, x, t);
+        return String.Format("{0}[{1}:{2}]", prev, x, t);
     }
 
     public override TType? Check(Var x) {
-        if (this.x.Equals(x)) {
+        if (this.x.Is(x)) {
             return t;
         } else {
             return prev.Check(x);

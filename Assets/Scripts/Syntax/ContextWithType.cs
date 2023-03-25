@@ -1,6 +1,6 @@
 namespace Syntax;
 
-class ContextWithType : Context {
+public class ContextWithType : Context {
     public Context prev { get; set; }
     public TypeVar x { get; set; }
     public Kind k { get; set; }
@@ -13,7 +13,7 @@ class ContextWithType : Context {
 
     public override string ToString()
     {
-        return String.Format("{0}, {1}:{2}", prev, x, k);
+        return String.Format("{0}[{1}:{2}]", prev, x, k);
     }
 
     public override TType? Check(Var x) {
@@ -21,7 +21,7 @@ class ContextWithType : Context {
     }
 
     public override Kind? Check(TypeVar t) {
-        if (this.x.Equals(t)) {
+        if (this.x.Is(t)) {
             return k;
         } else {
             return prev.Check(t);

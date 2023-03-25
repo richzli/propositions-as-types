@@ -1,5 +1,5 @@
 namespace Syntax;
 
-abstract class TType {
-    
+public abstract class TType {
+    public abstract bool Is(Object t);
 }
