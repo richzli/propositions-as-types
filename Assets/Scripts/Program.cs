@@ -4,6 +4,107 @@ using Theory;
 using System;
 class Program {
     static void Main(string[] args) {
+        ModusTollens();
+    }
+
+    static void ModusTollens() {
+        // modus tollens
+        // (P -> Q) -> (not Q -> not P)
+        // not is defined as not X = forall Y: X -> Y
+        Inference goal = new Inference(new JudgementTyping(
+            new Context()/*.With(
+                new Var("not"),
+                new Pi(new Var("X"), Sort.PROP,
+                    new Pi(new Var("Y"), Sort.PROP,
+                        new Pi(new Var("z"), new Var("X"), new Var("Y"))
+                    )
+                )
+            )*/,
+            new Context(),
+            new Hole(),
+            new Pi(new Var("A"), Sort.PROP,
+                new Pi(new Var("B"), Sort.PROP,
+                    new Pi(new Var("x"), new Pi(new Var("y"), new Var("A"), new Var("B")),
+                        /* TODO: after implementing conversion rules
+                        new Pi(new Var("z"), new App(new Var("not"), new Var("B")),
+                            new App(new Var("not"), new Var("A"))
+                        )
+                        */
+                        new Pi(new Var("z"), new Pi(new Var("C"), Sort.PROP, new Pi(new Var("b"), new Var("B"), new Var("C"))),
+                            new Pi(new Var("D"), Sort.PROP, new Pi(new Var("a"), new Var("A"), new Var("D")))
+                        )
+                    )
+                )
+            )
+        ));
+        Console.WriteLine(goal.conclusion);
+
+        List<Inference> tp = new List<Inference>();
+        Inference goal1 = goal;
+        
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Apply(goal1, new App(new Var("z"), new Var("D")));
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Apply(goal1, new Var("x"));
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Exact(goal1, new Var("a"));
+        tp.Add(goal1.premises![0]);
+
+        Console.WriteLine(goal.conclusion);
+
+        while (tp.Count != 0) {
+            Inference i = tp.Last();
+            tp.RemoveAt(tp.Count - 1);
+
+            TypeChecker.Check(i);
+
+            tp.AddRange(i.premises!);
+        }
+
+        if (goal.Valid()) {
+            Console.WriteLine("Proof is complete!");
+        } else {
+            Console.WriteLine("Incomplete proof.");
+        }
+    }
+
+    static void ModusPonens() {
         // modus ponens
         // A -> (A -> B) -> B
         Inference goal = new Inference(new JudgementTyping(

@@ -36,6 +36,16 @@ public class Abs : Term {
         return ret;
     }
 
+    public override Term Subst(Term v, Term t)
+    {
+        if (this.Is(v)) {
+            return t;
+        } else if (x.Is(v)) {
+            return this;
+        } else {
+            return new Abs(this.x, this.t, body.Subst(v, t));
+        }
+    }
 
     public override string ToString() {
         return $"(λ{x}:{t}. {body})";

@@ -32,9 +32,17 @@ public class App : Term {
         return ret;
     }
 
-
     public override bool Filled()
     {
         return t1.Filled() && t2.Filled();
+    }
+
+    public override Term Subst(Term v, Term t)
+    {
+        if (this.Is(v)) {
+            return t;
+        } else {
+            return new App(t1.Subst(v, t), t2.Subst(v, t));
+        }
     }
 }

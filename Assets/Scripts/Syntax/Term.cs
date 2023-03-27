@@ -13,4 +13,8 @@ public abstract class Term
     public virtual HashSet<Var> Free() {
         return new HashSet<Var>();
     }
+
+    public virtual Term Subst(Term v, Term t) {
+        return this;
+    }
 }

@@ -36,11 +36,22 @@ public class Pi : Term {
         return ret;
     }
 
-    public override string ToString() {
-        if (!body.Free().Contains(x)) {
-            return $"({t} → {body})";
+    public override Term Subst(Term v, Term t)
+    {
+        if (this.Is(v)) {
+            return t;
+        } else if (this.x.Is(v)) {
+            return this;
         } else {
-            return $"(Π{x}:{t}. {body})";
+            return new Pi(this.x, this.t, body.Subst(v, t));
         }
+    }
+
+    public override string ToString() {
+        //if (!body.Free().Contains(x)) {
+        //    return $"({t} → {body})";
+        //} else {
+            return $"(Π{x}:{t}. {body})";
+        //}
     }
 }

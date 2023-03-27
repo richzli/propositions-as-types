@@ -45,6 +45,14 @@ public class Var : Term
         return new HashSet<Var> { this };
     }
 
+    public override Term Subst(Term v, Term t)
+    {
+        if (v.Is(this)) {
+            return t;
+        }
+        return this;
+    }
+
     public override bool Equals(object? obj)
     {
         if (obj == null || !(obj is Var)) {

@@ -64,7 +64,7 @@ public class JudgementTyping : Judgement {
         // TODO: implement substitution
         return new List<Judgement>() {
             new JudgementTyping(
-                E, L, a.t1, new Pi(v, u, t2)
+                E, L, a.t1, new Pi(v, u, t2.Subst(a.t2, v))
             ),
             new JudgementTyping(
                 E, L, a.t2, u
@@ -83,7 +83,7 @@ public class JudgementTyping : Judgement {
         Sort x2 = (Sort) x;
         Sort t2 = (Sort) t;
 
-        if ((x2.Is(Sort.SET) || x2.Is(Sort.PROP)) && t2.Is(Sort.TYPE(0))) {
+        if ((x2.Is(Sort.SET) || x2.Is(Sort.PROP)) && t2.Is(Sort.TYPE(1))) {
             return new List<Judgement>();
         }
 

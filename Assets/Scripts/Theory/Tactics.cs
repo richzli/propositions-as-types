@@ -61,4 +61,39 @@ public class Tactics {
         h.Fill(new App(x, new Hole()));
         return i.Apply("App", new Object[2] { p.x, p.t });
     }
+
+    public static bool Apply(Inference i, App a) {
+        if (!(i.conclusion is JudgementTyping)) {
+            return false;
+        }
+
+        JudgementTyping j = (JudgementTyping) i.conclusion;
+
+        if (!(j.x is Hole)) {
+            return false;
+        }
+
+        Hole h = (Hole) j.x;
+
+        // TODO: figure out how to do multiple levels of App later, i.e., what if tt is App
+        // honestly could be simplified to some beta reduction or something idk brain not working rn
+        if (!(a.t1 is Var)) {
+            return false;
+        }
+
+        Term? tt = j.Get((Var) a.t1);
+        if (tt == null || !(tt is Pi)) {
+            return false;
+        }
+        Pi p = (Pi) tt;
+
+        Term t2 = p.body.Subst(p.x, a.t2);
+        if (!(t2 is Pi)) {
+            return false;
+        }
+        Pi p2 = (Pi) t2;
+
+        h.Fill(new App(a, new Hole()));
+        return i.Apply("App", new Object[2] { p2.x, p2.t });
+    }
 }

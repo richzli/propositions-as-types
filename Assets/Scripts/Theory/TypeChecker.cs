@@ -13,9 +13,39 @@ public class TypeChecker {
             } else if (j.x is Pi && j.t.Is(Sort.PROP)) {
                 Pi p = (Pi) j.x;
                 if (p.t.Is(Sort.PROP)) {
-                    return i.Apply("ProdTypeProp", new Object[1] { 0 });
+                    return i.Apply("ProdTypeProp", new Object[1] { 1 });
                 } else {
                     return i.Apply("ProdPropProp", new Object[0]);
+                }
+            } else if (j.x is App) {
+                App a = (App) j.x;
+                Pi? p = null;
+                Abs? aa = null;
+                if (a.t1 is Pi) {
+                    p = (Pi) a.t1;
+                } else if (a.t1 is Abs) {
+                    aa = (Abs) a.t1;
+                } else if (a.t1 is Var) {
+                    Var v = (Var) a.t1;
+                    if (j.L.Has(v)) {
+                        if (j.L.Get(v) is Pi) {
+                            p = (Pi) j.L.Get(v)!;
+                        } else if (j.L.Get(v) is Abs) {
+                            aa = (Abs) j.L.Get(v)!;
+                        }
+                    } else if (j.E.Has(v)) {
+                        if (j.E.Get(v) is Pi) {
+                            p = (Pi) j.E.Get(v)!;
+                        } else if (j.L.Get(v) is Abs) {
+                            aa = (Abs) j.E.Get(v)!;
+                        }
+                    }
+                }
+
+                if (p != null) {
+                    return i.Apply("App", new Object[2] { p.x, p.t });
+                } else if (aa != null) {
+                    return i.Apply("App", new Object[2] { aa.x, aa.t });
                 }
             } else if (j.x is Sort) {
                 return i.Apply("Axiom", new Object[0]);
