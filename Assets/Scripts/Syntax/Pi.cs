@@ -48,10 +48,10 @@ public class Pi : Term {
     }
 
     public override string ToString() {
-        //if (!body.Free().Contains(x)) {
-        //    return $"({t} → {body})";
-        //} else {
+        if (!body.Free().Contains(x)) {
+            return $"({t} → {body})";
+        } else {
             return $"(Π{x}:{t}. {body})";
-        //}
+        }
     }
 }
