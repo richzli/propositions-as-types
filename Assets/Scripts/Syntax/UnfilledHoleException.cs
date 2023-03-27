@@ -1,4 +1,3 @@
-using System;
 using Syntax;
 
 public class UnfilledHoleException : Exception {

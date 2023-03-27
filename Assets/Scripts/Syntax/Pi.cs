@@ -1,11 +1,11 @@
 namespace Syntax;
 
-public class Abs : Term {
+public class Pi : Term {
     public Var x { get; set; }
     public Term t { get; set; }
     public Term body { get; set; }
 
-    public Abs(Var x, Term t, Term body) {
+    public Pi(Var x, Term t, Term body) {
         this.x = x;
         this.t = t;
         this.body = body;
@@ -16,11 +16,11 @@ public class Abs : Term {
             return this.Is(((Hole) o).x!);
         }
 
-        if (!(o is Abs)) {
+        if (!(o is Pi)) {
             return false;
         }
 
-        return x.Is(((Abs) o).x) && t.Is(((Abs) o).t) && body.Is(((Abs) o).body);
+        return x.Is(((Pi) o).x) && t.Is(((Pi) o).t) && body.Is(((Pi) o).body);
     }
 
     public override bool Filled()
@@ -36,8 +36,11 @@ public class Abs : Term {
         return ret;
     }
 
-
     public override string ToString() {
-        return $"(λ{x}:{t}. {body})";
+        if (!body.Free().Contains(x)) {
+            return $"({t} → {body})";
+        } else {
+            return $"(Π{x}:{t}. {body})";
+        }
     }
 }

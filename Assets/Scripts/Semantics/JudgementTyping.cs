@@ -4,122 +4,167 @@ namespace Semantics;
 
 public class JudgementTyping : Judgement {
     public Term x { get; set; }
-    public TType t { get; set; }
+    public Term t { get; set; }
 
-    public JudgementTyping(Context L, Term x, TType t) : base(L) {
+    public JudgementTyping(Context E, Context L, Term x, Term t) : base(E, L) {
         this.x = x;
         this.t = t;
     }
-
-    public List<Judgement> TVar() {
-        Term x2;
-
-        if (x is Hole) {
-            x2 = ((Hole) x).Get();
-        } else {
-            x2 = x;
-        }
+    public List<Judgement>? Var()
+    {
+        Term x2 = x.Get();
+        Term t2 = t.Get();
 
         if (!(x2 is Var)) {
-            throw new InvalidRuleApplicationException("TVar");
+            return null;
         }
 
         Var v = (Var) x2;
 
-        List<Judgement> premises = new List<Judgement>();
-        premises.Add(new JudgementTypeCheck(
-            L, v, t
-        ));
-        premises.Add(new JudgementKinding(
-            L, t, KindStar.STAR
-        ));
-
-        return premises;
+        return new List<Judgement>() {
+            new JudgementChecking(
+                E, L, v, t
+            )
+        };
     }
 
-    public List<Judgement> TAbs() {
-        Term x2;
+    public List<Judgement>? Abs(Sort s)
+    {
+        Term x2 = x.Get();
+        Term t2 = t.Get();
 
-        if (x is Hole) {
-            x2 = ((Hole) x).Get();
-        } else {
-            x2 = x;
-        }
-
-        if (!(x2 is Abs && t is TypePi)) {
-            throw new InvalidRuleApplicationException("TAbs");
+        if (!(x2 is Abs && t2 is Pi)) {
+            return null;
         }
 
         Abs a = (Abs) x2;
-        TypePi tp = (TypePi) t;
+        Pi p = (Pi) t2;
 
-        // TODO: implement alpha equivalence/subst instead of this
-        if (!(a.x.Is(tp.x) && a.t.Is(tp.t))) {
-            throw new InvalidRuleApplicationException("TAbs (alpha)");
-        }
-
-        List<Judgement> premises = new List<Judgement>();
-        premises.Add(new JudgementKinding(
-            L, a.t, KindStar.STAR
-        ));
-        premises.Add(new JudgementTyping(
-            new ContextWithTerm(L, a.x, a.t), a.body, tp.body
-        ));
-
-        return premises;
+        return new List<Judgement>() {
+            new JudgementTyping(
+                E, L, p, s
+            ),
+            new JudgementTyping(
+                E, L.With(a.x, a.t), a.body, p.body
+            )
+        };
     }
 
-    // like before, checker needs hints for now
-    public List<Judgement> TApp(Var v, TType tt) {
-        Term x2;
-
-        if (x is Hole) {
-            x2 = ((Hole) x).Get();
-        } else {
-            x2 = x;
-        }
+    public List<Judgement>? App(Var v, Term u)
+    {
+        Term x2 = x.Get();
+        Term t2 = t.Get();
 
         if (!(x2 is App)) {
-            throw new InvalidRuleApplicationException("TApp");
+            return null;
         }
-
-        // TODO: implement [x -> t2]T
 
         App a = (App) x2;
 
-        List<Judgement> premises = new List<Judgement>();
-        premises.Add(new JudgementTyping(
-            L, a.t1, new TypePi(v, tt, t)
-        ));
-        premises.Add(new JudgementTyping(
-            L, a.t2, tt
-        ));
-
-        return premises;
+        // TODO: implement substitution
+        return new List<Judgement>() {
+            new JudgementTyping(
+                E, L, a.t1, new Pi(v, u, t2)
+            ),
+            new JudgementTyping(
+                E, L, a.t2, u
+            )
+        };
     }
 
-    public List<Judgement> TConv(TType t2) {
-        List<Judgement> premises = new List<Judgement>();
-        premises.Add(new JudgementTyping(
-            L, x, t2
-        ));
-        premises.Add(new JudgementTypeEquiv(
-            L, t, t2, KindStar.STAR
-        ));
+    // TODO: implement let definitions? probably necessary for recursion
 
-        return premises;
+    public List<Judgement>? Axiom()
+    {
+        if (!(x is Sort && t is Sort)) {
+            return null;
+        }
+
+        Sort x2 = (Sort) x;
+        Sort t2 = (Sort) t;
+
+        if ((x2.Is(Sort.SET) || x2.Is(Sort.PROP)) && t2.Is(Sort.TYPE(0))) {
+            return new List<Judgement>();
+        }
+
+        if (x2.IsType() && t2.IsType() && x2.Level() + 1 == t2.Level()) {
+            return new List<Judgement>();
+        }
+
+        return null;
+    }    
+
+    public List<Judgement>? Prod(Sort s1, Sort s2, Sort s3) {
+        Term x2 = x.Get();
+        Term t2 = t.Get();
+
+        if (!(x2 is Pi && t2.Is(s3))) {
+            return null;
+        }
+
+        Pi p = (Pi) x2;
+
+        if (s2.Is(s3)) {
+            if (s2.Is(Sort.SET) && s1.IsType()) {
+                return null;
+            }
+            if (s2.IsType() && s1.IsType() && s1.Level() > s2.Level()) {
+                return null;
+            }
+        } else {
+            if (!(s1.IsType() && s2.IsType() && s3.IsType() && s3.Level() == Math.Max(s1.Level(), s2.Level()))) {
+                return null;
+            }
+        }
+
+        return new List<Judgement>() {
+            new JudgementTyping(
+                E, L, p.t, s1
+            ),
+            new JudgementTyping(
+                E, L.With(p.x, p.t), p.body, s2
+            )
+        };
+    }
+
+    public List<Judgement>? Conv(Term u, Sort s) {
+        return new List<Judgement> {
+            new JudgementTyping(
+                E, L, x, u
+            ),
+            new JudgementTyping(
+                E, L, u, s
+            ),
+            new JudgementEquiv(
+                E, L, t, u
+            )
+        };
     }
 
     public override List<Judgement>? Apply(string s, Object[] args) {
         switch (s) {
-            case "TVar":
-                return TVar();
-            case "TAbs":
-                return TAbs();
-            case "TApp":
-                return TApp((Var) args[0], (TType) args[1]);
-            case "TConv":
-                return TConv((TType) args[0]);
+            case "Var":
+                return Var();
+            case "Abs":
+                return Abs((Sort) args[0]);
+            case "App":
+                return App((Var) args[0], (Term) args[1]);
+            case "Axiom":
+                return Axiom();
+            case "ProdPropProp":
+                return Prod(Sort.PROP, Sort.PROP, Sort.PROP);
+            case "ProdSetProp":
+                return Prod(Sort.SET, Sort.PROP, Sort.PROP);
+            case "ProdPropSet":
+                return Prod(Sort.PROP, Sort.SET, Sort.SET);
+            case "ProdSetSet":
+                return Prod(Sort.SET, Sort.SET, Sort.SET);
+            case "ProdTypeProp":
+                return Prod(Sort.TYPE((int) args[0]), Sort.PROP, Sort.PROP);
+            case "ProdTypeType":
+                return Prod(Sort.TYPE((int) args[0]), Sort.TYPE((int) args[1]), Sort.TYPE((int) args[2]));
+            case "Conv":
+                return Conv((Term) args[0], (Sort) args[1]);
             default:
                 return null;
         }
@@ -127,6 +172,6 @@ public class JudgementTyping : Judgement {
 
     public override string ToString()
     {
-        return String.Format("{0} ⊢ {1} : {2}", L, x, t);
+        return $"[{E}][{L}] ⊢ {x} : {t}";
     }
 }

@@ -25,6 +25,14 @@ public class App : Term {
         return string.Format("{0} {1}", t1, t2);
     }
 
+    public override HashSet<Var> Free()
+    {
+        HashSet<Var> ret = new HashSet<Var>(t1.Free());
+        ret.UnionWith(t2.Free());
+        return ret;
+    }
+
+
     public override bool Filled()
     {
         return t1.Filled() && t2.Filled();

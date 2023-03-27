@@ -17,22 +17,22 @@ public class Hole : Term {
 
     public override bool Is(Object h)
     {
-        if (x == null) {
+        if (!Filled()) {
             return false;
         }
 
         if (h is Hole) {
-            if (((Hole) h).x == null) {
+            if (!((Hole) h).Filled()) {
                 return false;
             }
-            return x.Is(((Hole) h).x!);
+            return x!.Is(((Hole) h).x!);
         } else {
-            return x.Is(h);
+            return x!.Is(h);
         }
     }
 
     public bool Fill(Term x) {
-        if (this.x == null) {
+        if (!Filled()) {
             this.x = x;
             return true;
         } else {
@@ -45,7 +45,16 @@ public class Hole : Term {
         return x != null;
     }
 
-    public Term Get() {
+    public override HashSet<Var> Free()
+    {
+        if (!Filled()) {
+            return new HashSet<Var>();
+        } else {
+            return x!.Free();
+        }
+    }
+
+    public override Term Get() {
         if (x == null) {
             throw new UnfilledHoleException(this);
         }

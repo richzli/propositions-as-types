@@ -11,15 +11,15 @@ public class Tactics {
 
         JudgementTyping j = (JudgementTyping) i.conclusion;
 
-        if (!(j.x is Hole && j.t is TypePi)) {
+        if (!(j.x is Hole && j.t is Pi)) {
             return false;
         }
 
         Hole h = (Hole) j.x;
-        TypePi tp = (TypePi) j.t;
+        Pi p = (Pi) j.t;
 
-        h.Fill(new Abs(tp.x, tp.t, new Hole()));
-        return i.Apply("TAbs", new Object[0]);
+        h.Fill(new Abs(p.x, p.t, new Hole()));
+        return i.Apply("Abs", new Object[1] { Sort.PROP });
     }
 
     public static bool Exact(Inference i, Var x) {
@@ -36,7 +36,7 @@ public class Tactics {
         Hole h = (Hole) j.x;
 
         h.Fill(x);
-        return i.Apply("TVar", new Object[0]);
+        return i.Apply("Var", new Object[0]);
     }
 
     public static bool Apply(Inference i, Var x) {
@@ -52,13 +52,13 @@ public class Tactics {
 
         Hole h = (Hole) j.x;
 
-        TType? tt = j.L.Check(x);
-        if (tt == null || !(tt is TypePi)) {
+        Term? tt = j.Get(x);
+        if (tt == null || !(tt is Pi)) {
             return false;
         }
-        TypePi tp = (TypePi) tt;
+        Pi p = (Pi) tt;
 
         h.Fill(new App(x, new Hole()));
-        return i.Apply("TApp", new Object[2] { tp.x, tp.t });
+        return i.Apply("App", new Object[2] { p.x, p.t });
     }
 }
