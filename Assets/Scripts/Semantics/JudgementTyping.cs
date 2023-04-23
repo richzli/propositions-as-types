@@ -60,6 +60,8 @@ public class JudgementTyping : Judgement {
         }
 
         App a = (App) x2;
+        Console.WriteLine($"a: {a}");
+        Console.WriteLine($"t2: {t2}");
 
         // TODO: implement substitution
         return new List<Judgement>() {

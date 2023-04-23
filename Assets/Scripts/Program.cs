@@ -1,10 +1,11 @@
-using Syntax;
+﻿using Syntax;
 using Semantics;
 using Theory;
 using System;
 class Program {
     static void Main(string[] args) {
-        ModusTollens();
+        //ModusTollens();
+        test();
     }
 
     static void ModusTollens() {
@@ -189,6 +190,41 @@ class Program {
             // Console.Write($"{i.conclusion}: ");
             //i.Apply(rules[j] /*  Console.ReadLine()! */, new Object[1] { 0 }); // note: Prop : Type(0) is Axiom
             ++j;
+
+            tp.AddRange(i.premises!);
+        }
+
+        if (goal.Valid()) {
+            Console.WriteLine("Proof is complete!");
+        } else {
+            Console.WriteLine("Incomplete proof.");
+        }
+    }
+
+    static void test() {
+        Inference goal = new Inference(new JudgementTyping(
+            new Context(),
+            new Context(),
+            new Hole(),
+            new Var("N")
+        ));
+
+        Console.WriteLine($"{new Pi(new Var("x"), new Var("N"), new Var("x"))}");
+
+        Console.WriteLine($"goal: {goal.conclusion}");
+
+        Tactics.Apply(goal, new Var("x"), new Pi(new Var("x"), new Var("N"), new Var("x")));
+        Inference tpA = goal.premises![0];
+        Inference goal1 = goal.premises![1];
+        Console.WriteLine($"tpA: {tpA.conclusion}");
+        Console.WriteLine($"goal1: {goal1.conclusion}");
+
+        List<Inference> tp = new List<Inference>() { tpA };
+        while (tp.Count != 0) {
+            Inference i = tp.Last();
+            tp.RemoveAt(tp.Count - 1);
+
+            TypeChecker.Check(i);
 
             tp.AddRange(i.premises!);
         }

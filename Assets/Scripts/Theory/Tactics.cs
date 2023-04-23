@@ -54,7 +54,35 @@ public class Tactics {
 
         Term? tt = j.Get(x);
         if (tt == null || !(tt is Pi)) {
+            Console.WriteLine("didn't find in context");
             return false;
+        }
+        Pi p = (Pi) tt;
+
+        h.Fill(new App(x, new Hole()));
+        return i.Apply("App", new Object[2] { p.x, p.t });
+    }
+
+    public static bool Apply(Inference i, Var x, Pi a) {
+        if (!(i.conclusion is JudgementTyping)) {
+            return false;
+        }
+
+        JudgementTyping j = (JudgementTyping) i.conclusion;
+
+        if (!(j.x is Hole)) {
+            return false;
+        }
+
+        Hole h = (Hole) j.x;
+
+        Term? tt = j.Get(x);
+        if (tt == null || !(tt is Pi)) {
+            Console.WriteLine("didn't find in context");
+            h.Fill(new App(x, new Hole()));
+            Console.WriteLine(i.conclusion);
+            Console.WriteLine($"a.x: {a.x}, a.t: {a.t}");
+            return i.Apply("App", new Object[2] { a.x, a.t });
         }
         Pi p = (Pi) tt;
 
