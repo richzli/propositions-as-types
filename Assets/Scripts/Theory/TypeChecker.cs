@@ -43,9 +43,9 @@ public class TypeChecker {
                 }
 
                 if (p != null) {
-                    return i.Apply("App", new Object[2] { p.x, p.t });
+                    return i.Apply("App", new Object[3] { p.x, p.t, p.body });
                 } else if (aa != null) {
-                    return i.Apply("App", new Object[2] { aa.x, aa.t });
+                    return i.Apply("App", new Object[3] { aa.x, aa.t, aa.body });
                 }
             } else if (j.x is Sort) {
                 return i.Apply("Axiom", new Object[0]);

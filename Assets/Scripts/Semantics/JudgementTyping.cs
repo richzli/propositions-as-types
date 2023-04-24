@@ -60,13 +60,33 @@ public class JudgementTyping : Judgement {
         }
 
         App a = (App) x2;
-        Console.WriteLine($"a: {a}");
-        Console.WriteLine($"t2: {t2}");
 
         // TODO: implement substitution
         return new List<Judgement>() {
             new JudgementTyping(
                 E, L, a.t1, new Pi(v, u, t2.Subst(a.t2, v))
+            ),
+            new JudgementTyping(
+                E, L, a.t2, u
+            )
+        };
+    }
+
+    public List<Judgement>? App(Var v, Term u, Term b)
+    {
+        Term x2 = x.Get();
+        Term t2 = t.Get();
+
+        if (!(x2 is App)) {
+            return null;
+        }
+
+        App a = (App) x2;
+
+        // TODO: implement substitution
+        return new List<Judgement>() {
+            new JudgementTyping(
+                E, L, a.t1, new Pi(v, u, b)
             ),
             new JudgementTyping(
                 E, L, a.t2, u
@@ -150,7 +170,7 @@ public class JudgementTyping : Judgement {
             case "Abs":
                 return Abs((Sort) args[0]);
             case "App":
-                return App((Var) args[0], (Term) args[1]);
+                return App((Var) args[0], (Term) args[1], (Term) args[2]);
             case "Axiom":
                 return Axiom();
             case "ProdPropProp":
