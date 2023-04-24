@@ -61,6 +61,8 @@ public class JudgementTyping : Judgement {
 
         App a = (App) x2;
 
+        Console.WriteLine($"t2: {t2}, a.t2: {a.t2}, v: {v}");
+        Console.WriteLine($"call: {new Pi(v, u, t2.Subst(a.t2, v))}");
         // TODO: implement substitution
         return new List<Judgement>() {
             new JudgementTyping(

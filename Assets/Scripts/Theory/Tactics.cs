@@ -19,6 +19,7 @@ public class Tactics {
         Pi p = (Pi) j.t;
 
         h.Fill(new Abs(p.x, p.t, new Hole()));
+        Console.WriteLine($"hole: { i.conclusion }");
         return i.Apply("Abs", new Object[1] { Sort.PROP });
     }
 
@@ -59,6 +60,9 @@ public class Tactics {
         Pi p = (Pi) tt;
 
         h.Fill(new App(x, new Hole()));
+        Console.WriteLine($"p.x: {p.x}, p.t: {p.t}, p.body: {p.body}");
+        Console.WriteLine(h);
+    Console.WriteLine($"hole --> {i.conclusion}");
         return i.Apply("App", new Object[2] { p.x, p.t });
     }
 

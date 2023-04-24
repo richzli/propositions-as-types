@@ -4,7 +4,8 @@ using Theory;
 using System;
 class Program {
     static void Main(string[] args) {
-        ModusTollens();
+        //ModusTollens();
+        ModusPonens();
     }
 
     static void ModusTollens() {
@@ -128,6 +129,7 @@ class Program {
 
         Inference tpA = goal.premises![0];
         Inference goalA = goal.premises![1];
+        Console.WriteLine(tpA.conclusion);
         Console.WriteLine(goalA.conclusion);
 
         Tactics.Intro(goalA);
@@ -135,6 +137,8 @@ class Program {
         Inference tpB = goalA.premises![0];
         Inference goalB = goalA.premises![1];
         Console.WriteLine(goalB.conclusion);
+
+        Console.WriteLine($"After Intro(A): {goal.conclusion}");
 
         Tactics.Intro(goalB);
 
@@ -152,9 +156,11 @@ class Program {
 
         // Console.WriteLine(goal.conclusion);
 
+        Console.WriteLine("apply");
         Tactics.Apply(goal3, new Var("y"));
 
         Inference tp3 = goal3.premises![0];
+        Console.WriteLine($"-----{tp3.conclusion}\n");
         Inference goal4 = goal3.premises![1];
         Console.WriteLine(goal4.conclusion);
 
