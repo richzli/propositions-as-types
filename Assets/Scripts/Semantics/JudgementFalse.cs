@@ -1,12 +1,19 @@
 using Syntax;
 
-namespace Semantics;
+namespace Semantics {
 
-public class JudgementFalse : Judgement {
-    public JudgementFalse(Context E, Context L) : base(E, L) {}
+    public class JudgementFalse : Judgement {
+        public JudgementFalse(Context E, Context L) : base(E, L) {}
 
-    public override string ToString()
-    {
-        return "FALSE";
+        public override string GetTerm()
+        {
+            return "FALSE";
+        }
+
+        public override string ToString()
+        {
+            return "FALSE";
+        }
     }
+
 }

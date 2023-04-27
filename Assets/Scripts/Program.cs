@@ -1,10 +1,16 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+
 using Syntax;
 using Semantics;
 using Theory;
-using System;
+
 class Program {
     static void Main(string[] args) {
         ModusTollens();
+        //ModusPonens();
+        //test();
     }
 
     static void ModusTollens() {
@@ -69,14 +75,14 @@ class Program {
         Console.WriteLine(goal1.conclusion);
         Console.WriteLine(goal.conclusion);
 
-        Tactics.Apply(goal1, new App(new Var("z"), new Var("D")));
+        Tactics.Apply(goal1, new App(new Var("z"), new Var("D")), new Var("D"));
         tp.Add(goal1.premises![0]);
         goal1 = goal1.premises![1];
 
         Console.WriteLine(goal1.conclusion);
         Console.WriteLine(goal.conclusion);
 
-        Tactics.Apply(goal1, new Var("x"));
+        Tactics.Apply(goal1, new Var("x"), new Var("B"));
         tp.Add(goal1.premises![0]);
         goal1 = goal1.premises![1];
 
@@ -89,7 +95,7 @@ class Program {
         Console.WriteLine(goal.conclusion);
 
         while (tp.Count != 0) {
-            Inference i = tp.Last();
+            Inference i = tp[tp.Count - 1];
             tp.RemoveAt(tp.Count - 1);
 
             TypeChecker.Check(i);
@@ -152,7 +158,7 @@ class Program {
 
         // Console.WriteLine(goal.conclusion);
 
-        Tactics.Apply(goal3, new Var("y"));
+        Tactics.Apply(goal3, new Var("y"), new Var("B"));
 
         Inference tp3 = goal3.premises![0];
         Inference goal4 = goal3.premises![1];
@@ -182,13 +188,84 @@ class Program {
         List<Inference> tp = new List<Inference>() { tpA, tpB, tp1, tp2, tp3, tp4 };
         int j = 0;
         while (tp.Count != 0) {
-            Inference i = tp.Last();
+            Inference i = tp[tp.Count - 1];
             tp.RemoveAt(tp.Count - 1);
 
             TypeChecker.Check(i);
             // Console.Write($"{i.conclusion}: ");
             //i.Apply(rules[j] /*  Console.ReadLine()! */, new Object[1] { 0 }); // note: Prop : Type(0) is Axiom
             ++j;
+
+            tp.AddRange(i.premises!);
+        }
+
+        if (goal.Valid()) {
+            Console.WriteLine("Proof is complete!");
+        } else {
+            Console.WriteLine("Incomplete proof.");
+        }
+    }
+
+    static void test() {
+
+        Inference goal = new Inference(new JudgementTyping(
+            new Context(),
+            new Context(),
+            new Hole(),
+            new Pi(new Var("B"), Sort.PROP,
+                    new Pi(new Var("x"), new Var("B"),
+                        new Pi(new Var("y"),
+                            new Pi(new Var("a"), new Var("B"), new Var("B")),
+                            new Var("B")
+                        )
+                    )
+                )
+            ));
+
+        Console.WriteLine($"goal: {goal.conclusion}");
+
+        List<Inference> tp = new List<Inference>();
+        Inference goal1 = goal;
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Intro(goal1);
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Apply(goal1, new Var("y"), new Var("B"));
+        tp.Add(goal1.premises![0]);
+        goal1 = goal1.premises![1];
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        Tactics.Exact(goal1, new Var("x"));
+        tp.Add(goal1.premises![0]);
+
+        Console.WriteLine(goal1.conclusion);
+        Console.WriteLine(goal.conclusion);
+
+        while (tp.Count != 0) {
+            Inference i = tp[tp.Count - 1];
+            tp.RemoveAt(tp.Count - 1);
+
+            TypeChecker.Check(i);
 
             tp.AddRange(i.premises!);
         }

@@ -1,99 +1,171 @@
+using System;
+
 using Syntax;
 using Semantics;
 
-namespace Theory;
+namespace Theory {
 
-public class Tactics {
-    public static bool Intro(Inference i) {
-        if (!(i.conclusion is JudgementTyping)) {
-            return false;
+    public class Tactics {
+        public static bool Intro(Inference i) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
+
+            JudgementTyping j = (JudgementTyping) i.conclusion;
+
+            if (!(j.x is Hole && j.t is Pi)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+            Pi p = (Pi) j.t;
+
+            h.Fill(new Abs(p.x, p.t, new Hole()));
+            return i.Apply("Abs", new Object[1] { Sort.PROP });
         }
 
-        JudgementTyping j = (JudgementTyping) i.conclusion;
+        public static bool Exact(Inference i, Var x) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
 
-        if (!(j.x is Hole && j.t is Pi)) {
-            return false;
+            JudgementTyping j = (JudgementTyping) i.conclusion;
+
+            if (!(j.x is Hole)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+
+            h.Fill(x);
+            return i.Apply("Var", new Object[0]);
         }
 
-        Hole h = (Hole) j.x;
-        Pi p = (Pi) j.t;
+        public static bool Apply(Inference i, Var x) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
 
-        h.Fill(new Abs(p.x, p.t, new Hole()));
-        return i.Apply("Abs", new Object[1] { Sort.PROP });
-    }
+            JudgementTyping j = (JudgementTyping) i.conclusion;
 
-    public static bool Exact(Inference i, Var x) {
-        if (!(i.conclusion is JudgementTyping)) {
-            return false;
+            if (!(j.x is Hole)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+
+            Term? tt = j.Get(x);
+            if (tt == null || !(tt is Pi)) {
+                Console.WriteLine("didn't find in context");
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            h.Fill(new App(x, new Hole()));
+            return i.Apply("App", new Object[2] { p.x, p.t });
         }
 
-        JudgementTyping j = (JudgementTyping) i.conclusion;
+        public static bool Apply(Inference i, Var x, Term b) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
 
-        if (!(j.x is Hole)) {
-            return false;
+            JudgementTyping j = (JudgementTyping) i.conclusion;
+
+            if (!(j.x is Hole)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+
+            Term? tt = j.Get(x);
+            if (tt == null || !(tt is Pi)) {
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            h.Fill(new App(x, new Hole()));
+            return i.Apply("App", new Object[3] { p.x, p.t, b });
         }
 
-        Hole h = (Hole) j.x;
+            public static bool Apply(Inference i, App a) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
 
-        h.Fill(x);
-        return i.Apply("Var", new Object[0]);
-    }
+            JudgementTyping j = (JudgementTyping) i.conclusion;
 
-    public static bool Apply(Inference i, Var x) {
-        if (!(i.conclusion is JudgementTyping)) {
-            return false;
+            if (!(j.x is Hole)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+
+            // TODO: figure out how to do multiple levels of App later, i.e., what if tt is App
+            // honestly could be simplified to some beta reduction or something idk brain not working rn
+            if (!(a.t1 is Var)) {
+                return false;
+            }
+
+            Term? tt = j.Get((Var) a.t1);
+            if (tt == null || !(tt is Pi)) {
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            Term t2 = p.body.Subst(p.x, a.t2);
+            if (!(t2 is Pi)) {
+                return false;
+            }
+            Pi p2 = (Pi) t2;
+
+            h.Fill(new App(a, new Hole()));
+            return i.Apply("App", new Object[2] { p2.x, p2.t });
         }
 
-        JudgementTyping j = (JudgementTyping) i.conclusion;
+        public static bool Apply(Inference i, App a, Term b) {
+            if (!(i.conclusion is JudgementTyping)) {
+                return false;
+            }
 
-        if (!(j.x is Hole)) {
-            return false;
+            JudgementTyping j = (JudgementTyping) i.conclusion;
+
+            if (!(j.x is Hole)) {
+                return false;
+            }
+
+            Hole h = (Hole) j.x;
+
+            // TODO: figure out how to do multiple levels of App later, i.e., what if tt is App
+            // honestly could be simplified to some beta reduction or something idk brain not working rn
+            if (!(a.t1 is Var)) {
+                return false;
+            }
+
+            Term? tt = j.Get((Var) a.t1);
+            if (tt == null || !(tt is Pi)) {
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            Term t2 = p.body.Subst(p.x, a.t2);
+            if (!(t2 is Pi)) {
+                return false;
+            }
+            Pi p2 = (Pi) t2;
+
+            h.Fill(new App(a, new Hole()));
+            return i.Apply("App", new Object[3] { p2.x, p2.t, b });
         }
 
-        Hole h = (Hole) j.x;
-
-        Term? tt = j.Get(x);
-        if (tt == null || !(tt is Pi)) {
-            return false;
+        public static bool Apply(Inference i, Term x, Term b) {
+            if (x is Var) {
+                return Apply(i, (Var) x, b);
+            } else if (x is App) {
+                return Apply(i, (App) x, b);
+            } else {
+                return false;
+            }
         }
-        Pi p = (Pi) tt;
-
-        h.Fill(new App(x, new Hole()));
-        return i.Apply("App", new Object[2] { p.x, p.t });
-    }
-
-    public static bool Apply(Inference i, App a) {
-        if (!(i.conclusion is JudgementTyping)) {
-            return false;
-        }
-
-        JudgementTyping j = (JudgementTyping) i.conclusion;
-
-        if (!(j.x is Hole)) {
-            return false;
-        }
-
-        Hole h = (Hole) j.x;
-
-        // TODO: figure out how to do multiple levels of App later, i.e., what if tt is App
-        // honestly could be simplified to some beta reduction or something idk brain not working rn
-        if (!(a.t1 is Var)) {
-            return false;
-        }
-
-        Term? tt = j.Get((Var) a.t1);
-        if (tt == null || !(tt is Pi)) {
-            return false;
-        }
-        Pi p = (Pi) tt;
-
-        Term t2 = p.body.Subst(p.x, a.t2);
-        if (!(t2 is Pi)) {
-            return false;
-        }
-        Pi p2 = (Pi) t2;
-
-        h.Fill(new App(a, new Hole()));
-        return i.Apply("App", new Object[2] { p2.x, p2.t });
     }
 }
