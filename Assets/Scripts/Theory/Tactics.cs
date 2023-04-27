@@ -155,4 +155,53 @@ public class Tactics {
         h.Fill(new App(a, new Hole()));
         return i.Apply("App", new Object[3] { p2.x, p2.t, b });
     }
+
+    public static bool Apply(Inference i, Term x, Term b) {
+        if (!(i.conclusion is JudgementTyping)) {
+            return false;
+        }
+
+        JudgementTyping j = (JudgementTyping) i.conclusion;
+
+        if (!(j.x is Hole)) {
+            return false;
+        }
+
+        Hole h = (Hole) j.x;
+
+        if (x is Var) {
+
+            Term? tt = j.Get((Var) x);
+            if (tt == null || !(tt is Pi)) {
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            h.Fill(new App(x, new Hole()));
+            return i.Apply("App", new Object[3] { p.x, p.t, b });
+        } else if (x is App) {
+            App a = (App) x;
+
+            if (!(a.t1 is Var)) {
+                return false;
+            }
+
+            Term? tt = j.Get((Var) a.t1);
+            if (tt == null || !(tt is Pi)) {
+                return false;
+            }
+            Pi p = (Pi) tt;
+
+            Term t2 = p.body.Subst(p.x, a.t2);
+            if (!(t2 is Pi)) {
+                return false;
+            }
+            Pi p2 = (Pi) t2;
+
+            h.Fill(new App(a, new Hole()));
+            return i.Apply("App", new Object[3] { p2.x, p2.t, b });
+        } else {
+            return false;
+        }
+    }
 }
