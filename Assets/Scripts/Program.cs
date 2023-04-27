@@ -1,7 +1,11 @@
-﻿using Syntax;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+
+using Syntax;
 using Semantics;
 using Theory;
-using System;
+
 class Program {
     static void Main(string[] args) {
         ModusTollens();
@@ -91,7 +95,7 @@ class Program {
         Console.WriteLine(goal.conclusion);
 
         while (tp.Count != 0) {
-            Inference i = tp.Last();
+            Inference i = tp[tp.Count - 1];
             tp.RemoveAt(tp.Count - 1);
 
             TypeChecker.Check(i);
@@ -184,7 +188,7 @@ class Program {
         List<Inference> tp = new List<Inference>() { tpA, tpB, tp1, tp2, tp3, tp4 };
         int j = 0;
         while (tp.Count != 0) {
-            Inference i = tp.Last();
+            Inference i = tp[tp.Count - 1];
             tp.RemoveAt(tp.Count - 1);
 
             TypeChecker.Check(i);
@@ -258,7 +262,7 @@ class Program {
         Console.WriteLine(goal.conclusion);
 
         while (tp.Count != 0) {
-            Inference i = tp.Last();
+            Inference i = tp[tp.Count - 1];
             tp.RemoveAt(tp.Count - 1);
 
             TypeChecker.Check(i);

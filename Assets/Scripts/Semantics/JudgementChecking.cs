@@ -1,43 +1,58 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Syntax;
 
-namespace Semantics;
+namespace Semantics {
 
-public class JudgementChecking : Judgement {
-    public Var x { get; set; }
-    public Term t { get; set; }
+    public class JudgementChecking : Judgement {
+        public Var x { get; set; }
+        public Term t { get; set; }
 
-    public JudgementChecking(Context E, Context L, Var x, Term t) : base(E, L) {
-        this.x = x;
-        this.t = t;
-    }
+        public JudgementChecking(Context E, Context L, Var x, Term t) : base(E, L) {
+            this.x = x;
+            this.t = t;
+        }
 
-    public List<Judgement>? Check() {
-        if (L.Has(x)) {
-            // TODO: alpha equivalence
-            if (L.Get(x)!.Is(t)) {
-                return new List<Judgement>();
-            } else {
-                return null;
+        public List<Judgement>? Check() {
+            if (L.Has(x)) {
+                // TODO: alpha equivalence
+                if (L.Get(x)!.Is(t)) {
+                    return new List<Judgement>();
+                } else {
+                    return null;
+                }
+            } else if (E.Has(x)) {
+                if (E.Get(x)!.Is(t)) {
+                    return new List<Judgement>();
+                }
             }
-        } else if (E.Has(x)) {
-            if (E.Get(x)!.Is(t)) {
-                return new List<Judgement>();
+            return null;
+        }
+
+        public override List<Judgement>? Apply(string s, Object[] args) {
+            switch (s) {
+                case "Check":
+                    return Check();
+                default:
+                    return null;
             }
         }
-        return null;
-    }
 
-    public override List<Judgement>? Apply(string s, Object[] args) {
-        switch (s) {
-            case "Check":
-                return Check();
-            default:
-                return null;
+        public override bool Filled()
+        {
+            return x.Filled() && t.Filled();
+        }
+
+        public override string GetGoal()
+        {
+            return t.ToString();
+        }
+
+        public override string ToString()
+        {
+            return $"[{E}][{L}]({x}) = {t}";
         }
     }
 
-    public override string ToString()
-    {
-        return $"[{E}][{L}]({x}) = {t}";
-    }
 }
