@@ -48,6 +48,10 @@ public class TacticApplier : MonoBehaviour {
         input2.text = "";
     }
 
+    public void Check() {
+        GlobalState.Check();
+    }
+
     static Term? Parse(string text, ref int i) {
         int j = i;
         while (text[j] != '(') {

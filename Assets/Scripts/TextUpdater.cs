@@ -19,7 +19,12 @@ public class TextUpdater : MonoBehaviour {
 $@"{GlobalState.goals.Count} subgoal(s)
 {FormatContext()}
 ----------
-{((GlobalState.GetCurrentGoal() == null) ? "No goals remaining" : GlobalState.GetCurrentGoal().conclusion.GetGoal())}";
+{((GlobalState.GetCurrentGoal() == null) ? "No goals remaining" : GlobalState.GetCurrentGoal().conclusion.GetGoal())}
+
+----------
+{((GlobalState.root?.GetComponent<InferenceDisplay>()?.infer == null) ? "No program formed" : GlobalState.root.GetComponent<InferenceDisplay>().infer.conclusion.GetTerm())}
+
+{((GlobalState.root.GetComponent<InferenceDisplay>()?.infer != null && GlobalState.GetCurrentGoal() == null && GlobalState.checks.Count == 0) ? "Type checked successfully!" : "")}";
     }
 
     static String FormatContext() {

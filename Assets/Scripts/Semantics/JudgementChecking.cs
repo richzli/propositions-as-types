@@ -44,6 +44,11 @@ namespace Semantics {
             return x.Filled() && t.Filled();
         }
 
+        public override string GetTerm()
+        {
+            return x.ToString();
+        }
+
         public override string GetGoal()
         {
             return t.ToString();

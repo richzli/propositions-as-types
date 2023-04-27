@@ -26,6 +26,10 @@ namespace Semantics {
             return false;
         }
 
+        public virtual string GetTerm() {
+            return "";
+        }
+
         public virtual string GetGoal() {
             return "";
         }
